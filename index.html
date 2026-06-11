@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>YourCo — Data & Software Consulting</title>
+<style>
+  /* ── TOKENS ────────────────────────────────────────────── */
+  :root {
+    --black:   #0D0D0D;
+    --black2:  #1A1A1A;
+    --black3:  #2A2A2A;
+    --blue:    #1A6FD4;
+    --blue-lt: #2D87F0;
+    --blue-bg: #EBF3FD;
+    --white:   #FFFFFF;
+    --gray1:   #F7F8FA;
+    --gray2:   #E8EBF0;
+    --gray3:   #9A9DA6;
+    --gray4:   #5C5F6B;
+    --radius:  10px;
+    --radius-lg: 16px;
+  }
+
+  /* ── RESET ─────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--white); color: var(--black); line-height: 1.6; overflow-x: hidden; }
+  a { text-decoration: none; color: inherit; }
+  img { max-width: 100%; }
+
+  /* ── SCROLL ANIMATIONS ─────────────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+  .delay-1 { transition-delay: 0.1s; }
+  .delay-2 { transition-delay: 0.2s; }
+  .delay-3 { transition-delay: 0.3s; }
+  .delay-4 { transition-delay: 0.4s; }
+
+  /* ── NAV ────────────────────────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 64px;
+    background: var(--black);
+    transition: box-shadow 0.3s;
+  }
+  nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.4); }
+  .nav-logo { font-size: 18px; font-weight: 700; color: var(--white); letter-spacing: -0.3px; }
+  .nav-logo span { color: var(--blue); }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { font-size: 14px; color: #999; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta {
+    background: var(--blue); color: var(--white);
+    border: none; padding: 9px 22px; border-radius: var(--radius);
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .nav-cta:hover { background: var(--blue-lt); }
+  .nav-cta:active { transform: scale(0.97); }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; transition: 0.3s; }
+
+  /* ── HERO ───────────────────────────────────────────────── */
+  #hero {
+    min-height: 100vh; background: var(--black);
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 120px 48px 80px; position: relative; overflow: hidden;
+  }
+  #hero::before {
+    content: '';
+    position: absolute; top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(26,111,212,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(26,111,212,0.15); border: 1px solid rgba(26,111,212,0.3);
+    color: #7BB8F8; font-size: 12px; font-weight: 600;
+    padding: 5px 14px; border-radius: 20px; margin-bottom: 28px;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    width: fit-content;
+  }
+  .hero-badge::before { content: '●'; font-size: 8px; color: var(--blue); }
+  h1.hero-title {
+    font-size: clamp(36px, 5vw, 64px); font-weight: 800;
+    color: var(--white); letter-spacing: -1.5px; line-height: 1.08;
+    max-width: 720px; margin-bottom: 24px;
+  }
+  h1.hero-title em { color: var(--blue); font-style: normal; }
+  .hero-sub {
+    font-size: 18px; color: #888; line-height: 1.7;
+    max-width: 500px; margin-bottom: 40px;
+  }
+  .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 48px; }
+  .btn-blue {
+    background: var(--blue); color: var(--white);
+    border: none; padding: 14px 28px; border-radius: var(--radius);
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-blue:hover { background: var(--blue-lt); }
+  .btn-blue:active { transform: scale(0.97); }
+  .btn-outline {
+    background: transparent; color: var(--white);
+    border: 1px solid #444; padding: 14px 28px; border-radius: var(--radius);
+    font-size: 15px; font-weight: 500; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-outline:hover { border-color: #888; background: rgba(255,255,255,0.05); }
+  .hero-trust { font-size: 13px; color: #555; }
+  .hero-stats { display: flex; gap: 40px; margin-top: 64px; flex-wrap: wrap; }
+  .stat-item { border-left: 2px solid var(--blue); padding-left: 16px; }
+  .stat-num { font-size: 28px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; }
+  .stat-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+  /* ── SECTIONS COMMON ────────────────────────────────────── */
+  section { padding: 96px 48px; }
+  .section-eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--blue); margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: clamp(26px, 3vw, 40px); font-weight: 800;
+    letter-spacing: -0.8px; line-height: 1.15; margin-bottom: 12px;
+  }
+  .section-sub { font-size: 16px; color: var(--gray4); line-height: 1.7; max-width: 520px; margin-bottom: 48px; }
+
+  /* ── SERVICES ───────────────────────────────────────────── */
+  #services { background: var(--gray1); }
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+  .service-card {
+    background: var(--white); border: 1px solid var(--gray2);
+    border-radius: var(--radius-lg); padding: 28px 24px;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    cursor: default;
+  }
+  .service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(26,111,212,0.1);
+    border-color: rgba(26,111,212,0.3);
+  }
+  .service-icon {
+    width: 48px; height: 48px; background: var(--blue-bg);
+    border-radius: var(--radius); display: flex; align-items: center;
+    justify-content: center; margin-bottom: 18px; font-size: 22px;
+  }
+  .service-card h3 { font-size: 16px; font-weight: 700; color: var(--black); margin-bottom: 8px; }
+  .service-card p { font-size: 14px; color: var(--gray4); line-height: 1.6; }
+
+  /* ── HOW IT WORKS ───────────────────────────────────────── */
+  #process { background: var(--black); }
+  #process .section-title { color: var(--white); }
+  #process .section-sub { color: #777; }
+  .process-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: #222; border-radius: var(--radius-lg); overflow: hidden; }
+  .process-step { background: var(--black2); padding: 32px 24px; transition: background 0.2s; }
+  .process-step:hover { background: var(--black3); }
+  .step-tag { font-size: 11px; font-weight: 700; color: var(--blue); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+  .process-step h3 { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+  .process-step p { font-size: 13px; color: #666; line-height: 1.6; }
+
+  /* ── PRICING ────────────────────────────────────────────── */
+  #pricing { background: var(--white); }
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+  .pricing-card {
+    border: 1px solid var(--gray2); border-radius: var(--radius-lg);
+    padding: 32px 28px; transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+  .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); }
+  .pricing-card.featured {
+    border: 2px solid var(--blue);
+    background: var(--black);
+  }
+  .featured-badge {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--blue); color: var(--white);
+    font-size: 11px; font-weight: 700; padding: 3px 14px;
+    border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .pricing-name { font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--gray3); margin-bottom: 8px; }
+  .pricing-card.featured .pricing-name { color: #7BB8F8; }
+  .pricing-price { font-size: 36px; font-weight: 800; color: var(--black); letter-spacing: -1px; margin-bottom: 4px; }
+  .pricing-card.featured .pricing-price { color: var(--white); }
+  .pricing-period { font-size: 13px; color: var(--gray3); margin-bottom: 24px; }
+  .pricing-features { list-style: none; margin-bottom: 28px; }
+  .pricing-features li {
+    font-size: 14px; color: var(--gray4); padding: 7px 0;
+    border-bottom: 1px solid var(--gray2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pricing-card.featured .pricing-features li { color: #aaa; border-bottom-color: #333; }
+  .pricing-features li::before { content: '✓'; color: var(--blue); font-weight: 700; font-size: 13px; flex-shrink: 0; }
+  .pricing-cta {
+    width: 100%; padding: 12px; border-radius: var(--radius);
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    border: 1px solid var(--gray2); background: transparent; color: var(--black);
+  }
+  .pricing-cta:hover { background: var(--gray1); }
+  .pricing-cta:active { transform: scale(0.98); }
+  .pricing-card.featured .pricing-cta {
+    background: var(--blue); color: var(--white); border-color: var(--blue);
+  }
+  .pricing-card.featured .pricing-cta:hover { background: var(--blue-lt); border-color: var(--blue-lt); }
+
+  /* ── CONTACT ────────────────────────────────────────────── */
+  #contact { background: var(--gray1); }
+  .contact-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+  .contact-left h2 { font-size: 32px; font-weight: 800; color: var(--black); letter-spacing: -0.6px; margin-bottom: 14px; }
+  .contact-left p { font-size: 15px; color: var(--gray4); line-height: 1.7; margin-bottom: 32px; }
+  .contact-detail { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--gray4); margin-bottom: 12px; }
+  .contact-detail .icon { width: 36px; height: 36px; background: var(--blue-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .contact-form {
+    background: var(--white); border: 1px solid var(--gray2);
+    border-radius: var(--radius-lg); padding: 32px;
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--black); margin-bottom: 6px; }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%; padding: 11px 14px;
+    border: 1px solid var(--gray2); border-radius: var(--radius);
+    font-size: 14px; color: var(--black); background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    outline: none;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(26,111,212,0.1);
+  }
+  .form-group textarea { height: 100px; resize: vertical; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-submit {
+    width: 100%; padding: 13px; background: var(--blue); color: var(--white);
+    border: none; border-radius: var(--radius); font-size: 15px; font-weight: 600;
+    cursor: pointer; margin-top: 4px; transition: background 0.2s, transform 0.1s;
+  }
+  .form-submit:hover { background: var(--blue-lt); }
+  .form-submit:active { transform: scale(0.98); }
+  .form-success {
+    display: none; text-align: center; padding: 40px 20px;
+  }
+  .form-success .check { font-size: 40px; margin-bottom: 12px; }
+  .form-success h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--black); }
+  .form-success p { color: var(--gray4); font-size: 14px; }
+
+  /* ── MODAL ──────────────────────────────────────────────── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white); border-radius: var(--radius-lg);
+    padding: 40px; max-width: 480px; width: 90%;
+    animation: modalIn 0.3s ease;
+    position: relative;
+  }
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.94) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none; font-size: 20px; cursor: pointer;
+    color: var(--gray3); line-height: 1; padding: 4px 8px;
+  }
+  .modal-close:hover { color: var(--black); }
+  .modal h3 { font-size: 22px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: var(--gray4); margin-bottom: 24px; line-height: 1.6; }
+  .modal-form .form-group { margin-bottom: 14px; }
+  .modal-submit {
+    width: 100%; padding: 13px; background: var(--blue); color: var(--white);
+    border: none; border-radius: var(--radius); font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .modal-submit:hover { background: var(--blue-lt); }
+  .modal-success { display: none; text-align: center; padding: 16px 0 8px; }
+  .modal-success .check { font-size: 36px; margin-bottom: 10px; }
+  .modal-success h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .modal-success p { font-size: 14px; color: var(--gray4); }
+
+  /* ── FOOTER ─────────────────────────────────────────────── */
+  footer {
+    background: var(--black); padding: 32px 48px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  }
+  .footer-logo { font-size: 16px; font-weight: 700; color: var(--white); }
+  .footer-logo span { color: var(--blue); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-size: 13px; color: #555; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--white); }
+  .footer-copy { font-size: 12px; color: #444; width: 100%; }
+
+  /* ── TOAST ──────────────────────────────────────────────── */
+  #toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--black2); color: var(--white); padding: 12px 24px;
+    border-radius: 24px; font-size: 14px; font-weight: 500;
+    opacity: 0; transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none; z-index: 300; white-space: nowrap;
+    border: 1px solid #333;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── MOBILE ─────────────────────────────────────────────── */
+  @media (max-width: 720px) {
+    nav { padding: 0 24px; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    #hero, section { padding-left: 24px; padding-right: 24px; }
+    footer { padding: 24px; }
+    .contact-wrap { grid-template-columns: 1fr; gap: 32px; }
+    .form-row { grid-template-columns: 1fr; }
+    .hero-stats { gap: 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .reveal-left, .reveal-right { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="bookModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+    <div id="modalForm">
+      <h3 id="modalTitle">Book your free discovery call</h3>
+      <p>Tell us a bit about your business and we'll reach out within 24 hours to schedule a time.</p>
+      <div class="modal-form">
+        <div class="form-group"><label>Your name</label><input type="text" id="m-name" placeholder="Jane Smith" /></div>
+        <div class="form-group"><label>Business name</label><input type="text" id="m-biz" placeholder="Acme Co." /></div>
+        <div class="form-group"><label>Email</label><input type="email" id="m-email" placeholder="jane@acme.com" /></div>
+        <div class="form-group"><label>Biggest challenge right now</label><textarea id="m-msg" placeholder="e.g. our data is scattered across 3 spreadsheets and nothing connects..."></textarea></div>
+        <button class="modal-submit" onclick="submitModal()">Request a call →</button>
+      </div>
+    </div>
+    <div class="modal-success" id="modalSuccess">
+      <div class="check">✅</div>
+      <h3>You're on the list!</h3>
+      <p>We'll email you within 24 hours to lock in a time. Talk soon.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<!-- ── NAV ── -->
+<nav id="navbar">
+  <div class="nav-logo"><span>◆</span> YourCo</div>
+  <div class="nav-links">
+    <a href="#services">Services</a>
+    <a href="#process">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <button class="nav-cta" onclick="openModal()">Book a call</button>
+  <div class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-badge">Data &amp; software consulting</div>
+  <h1 class="hero-title reveal">We find what's<br>costing you &mdash;<br>and <em>fix it.</em></h1>
+  <p class="hero-sub reveal delay-1">We reach out, audit your systems, and build custom tools that eliminate the inefficiencies slowing your business down.</p>
+  <div class="hero-btns reveal delay-2">
+    <button class="btn-blue" onclick="openModal()">Book a free discovery call</button>
+    <a href="#process"><button class="btn-outline">See how it works</button></a>
+  </div>
+  <p class="hero-trust reveal delay-3">No commitment &nbsp;·&nbsp; 30-minute call &nbsp;·&nbsp; We come with ideas</p>
+  <div class="hero-stats">
+    <div class="stat-item reveal delay-1">
+      <div class="stat-num">48h</div>
+      <div class="stat-label">Avg. response time</div>
+    </div>
+    <div class="stat-item reveal delay-2">
+      <div class="stat-num">2–4 wks</div>
+      <div class="stat-label">From call to delivery</div>
+    </div>
+    <div class="stat-item reveal delay-3">
+      <div class="stat-num">$0</div>
+      <div class="stat-label">Discovery call cost</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SERVICES ── -->
+<section id="services">
+  <div class="section-eyebrow reveal">What we do</div>
+  <h2 class="section-title reveal">Built for your business,<br>not a template</h2>
+  <p class="section-sub reveal">We don't wait for you to come to us — we identify the problem and build the solution.</p>
+  <div class="services-grid">
+    <div class="service-card reveal delay-1">
+      <div class="service-icon">📊</div>
+      <h3>Custom apps & dashboards</h3>
+      <p>Purpose-built internal tools that fit the way your team actually works — not a generic SaaS that almost does the job.</p>
+    </div>
+    <div class="service-card reveal delay-2">
+      <div class="service-icon">🗄️</div>
+      <h3>Data cleanup & organization</h3>
+      <p>Messy spreadsheets, duplicated records, broken imports — structured, cleaned, and ready to use.</p>
+    </div>
+    <div class="service-card reveal delay-3">
+      <div class="service-icon">📈</div>
+      <h3>Financial visualizations</h3>
+      <p>Interactive models and charts that turn your raw numbers into clarity — built for decisions, not just reporting.</p>
+    </div>
+    <div class="service-card reveal delay-4">
+      <div class="service-icon">🔍</div>
+      <h3>Systems audit & consulting</h3>
+      <p>We review your current setup and show you exactly where time and money are slipping through the cracks.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROCESS ── -->
+<section id="process">
+  <div class="section-eyebrow reveal">How it works</div>
+  <h2 class="section-title reveal">From call to solution<br>in weeks, not months</h2>
+  <p class="section-sub reveal">A clear process so you always know what's happening and what comes next.</p>
+  <div class="process-grid">
+    <div class="process-step reveal delay-1">
+      <div class="step-tag">Step 01</div>
+      <h3>Discovery call</h3>
+      <p>Free 30-minute call. We ask questions, diagnose your biggest bottlenecks, and figure out what to tackle first.</p>
+    </div>
+    <div class="process-step reveal delay-2">
+      <div class="step-tag">Step 02</div>
+      <h3>Custom proposal</h3>
+      <p>We send a scoped plan with clear deliverables, timeline, and pricing. No surprises.</p>
+    </div>
+    <div class="process-step reveal delay-3">
+      <div class="step-tag">Step 03</div>
+      <h3>We build it</h3>
+      <p>You get a working solution — app, dashboard, or cleaned dataset — ready to use in your business.</p>
+    </div>
+    <div class="process-step reveal delay-4">
+      <div class="step-tag">Step 04</div>
+      <h3>Ongoing support</h3>
+      <p>Optional monthly retainer to maintain, update, and expand your tools as you grow.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING ── -->
+<section id="pricing">
+  <div class="section-eyebrow reveal">Pricing</div>
+  <h2 class="section-title reveal">Simple, transparent pricing</h2>
+  <p class="section-sub reveal">Start with a free call. Scale up only when you're ready.</p>
+  <div class="pricing-grid">
+    <div class="pricing-card reveal delay-1">
+      <div class="pricing-name">Starter project</div>
+      <div class="pricing-price">Custom</div>
+      <div class="pricing-period">Quoted per project</div>
+      <ul class="pricing-features">
+        <li>One scoped deliverable</li>
+        <li>Dashboard, app, or data cleanup</li>
+        <li>2-week average turnaround</li>
+        <li>1 round of revisions</li>
+      </ul>
+      <button class="pricing-cta" onclick="openModal()">Get a quote</button>
+    </div>
+    <div class="pricing-card featured reveal delay-2">
+      <div class="featured-badge">Most popular</div>
+      <div class="pricing-name">Monthly retainer</div>
+      <div class="pricing-price">Custom</div>
+      <div class="pricing-period">Billed monthly</div>
+      <ul class="pricing-features">
+        <li>Ongoing builds & maintenance</li>
+        <li>Priority response time</li>
+        <li>Monthly check-in call</li>
+        <li>Unlimited revision requests</li>
+      </ul>
+      <button class="pricing-cta" onclick="openModal()">Book a call</button>
+    </div>
+    <div class="pricing-card reveal delay-3">
+      <div class="pricing-name">Audit only</div>
+      <div class="pricing-price">Custom</div>
+      <div class="pricing-period">One-time engagement</div>
+      <ul class="pricing-features">
+        <li>Full systems review</li>
+        <li>Written recommendations report</li>
+        <li>Priority roadmap</li>
+        <li>Optional implementation add-on</li>
+      </ul>
+      <button class="pricing-cta" onclick="openModal()">Get started</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section id="contact">
+  <div class="contact-wrap">
+    <div class="reveal-left">
+      <div class="section-eyebrow">Get in touch</div>
+      <h2>Let's talk about<br>your business</h2>
+      <p>Not sure what you need yet? That's exactly what the discovery call is for. We'll figure it out together.</p>
+      <div class="contact-detail">
+        <div class="icon">✉️</div>
+        <span>hello@yourco.com</span>
+      </div>
+      <div class="contact-detail">
+        <div class="icon">📞</div>
+        <span>(555) 000-0000</span>
+      </div>
+      <div class="contact-detail">
+        <div class="icon">💼</div>
+        <span>linkedin.com/company/yourco</span>
+      </div>
+    </div>
+    <div class="contact-form reveal-right">
+      <div id="formBody">
+        <div class="form-row">
+          <div class="form-group"><label>Name</label><input type="text" id="c-name" placeholder="Jane Smith" /></div>
+          <div class="form-group"><label>Business</label><input type="text" id="c-biz" placeholder="Acme Co." /></div>
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="c-email" placeholder="jane@acme.com" /></div>
+        <div class="form-group">
+          <label>Service interested in</label>
+          <select id="c-service">
+            <option value="">Select one...</option>
+            <option>Custom app or dashboard</option>
+            <option>Data cleanup & organization</option>
+            <option>Financial visualization</option>
+            <option>Systems audit</option>
+            <option>Monthly retainer</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Tell us about the challenge</label><textarea id="c-msg" placeholder="Describe the problem you're trying to solve..."></textarea></div>
+        <button class="form-submit" onclick="submitContact()">Send message →</button>
+      </div>
+      <div class="form-success" id="formSuccess">
+        <div class="check">✅</div>
+        <h3>Message received!</h3>
+        <p>We'll get back to you within 24 hours. Keep an eye on your inbox.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo"><span>◆</span> YourCo</div>
+  <div class="footer-links">
+    <a href="#services">Services</a>
+    <a href="#process">Process</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+    <a href="#">LinkedIn</a>
+  </div>
+  <div class="footer-copy">© 2026 YourCo LLC. All rights reserved.</div>
+</footer>
+
+<script>
+  // ── SCROLL REVEAL ──
+  const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => observer.observe(el));
+
+  // kick visible on load for hero
+  document.querySelectorAll('#hero .reveal').forEach(el => {
+    setTimeout(() => el.classList.add('visible'), 100);
+  });
+
+  // ── NAV SCROLL ──
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // ── MODAL ──
+  function openModal() {
+    document.getElementById('bookModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('bookModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('bookModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  function submitModal() {
+    const name = document.getElementById('m-name').value.trim();
+    const email = document.getElementById('m-email').value.trim();
+    if (!name || !email) { showToast('Please fill in your name and email.'); return; }
+    document.getElementById('modalForm').style.display = 'none';
+    document.getElementById('modalSuccess').style.display = 'block';
+    setTimeout(closeModal, 3200);
+  }
+
+  // ── CONTACT FORM ──
+  function submitContact() {
+    const name = document.getElementById('c-name').value.trim();
+    const email = document.getElementById('c-email').value.trim();
+    if (!name || !email) { showToast('Please fill in your name and email.'); return; }
+    document.getElementById('formBody').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  }
+
+  // ── TOAST ──
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ── MOBILE MENU ──
+  function toggleMobileMenu() {
+    showToast('Add a mobile nav menu here when you customize the site.');
+  }
+</script>
+</body>
+</html>
